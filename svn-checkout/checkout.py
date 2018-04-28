@@ -8,9 +8,12 @@ if __name__ == '__main__':
     while True:
         cnt = cnt + 1
         print 'Checking out...'
-        cmd = 'svn cleanup SparkMessaging && svn checkout https://wwwin-svn-sjc-3.cisco.com/jabber-all/jabber/branches/features/SparkMessaging/'
+        cmd = 'svn checkout https://wwwin-svn-sjc-3.cisco.com/jabber-all/jabber/branches/features/SparkMessaging/'
 
         ret = subprocess.call(cmd, shell=True)
+        if ret != 0:
+            subprocess.call('svn cleanup SparkMessaging', shell=True)
+
         if ret == 0 or cnt > 100:
             break
 
