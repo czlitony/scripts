@@ -10,7 +10,7 @@ def run_test(program):
     """do test"""
     t0 = time.time()
 
-    command = "rm -f jabber.log*;./" + program + " >" + program + ".log 2>&1"
+    command = "rm -f jabber.log*;./" + program + " > repeat_test.log 2>&1"
 
     sp = subprocess.Popen(command, shell=True)
     sp.communicate()
