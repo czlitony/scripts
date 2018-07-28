@@ -170,13 +170,13 @@ def stop_music():
     if pygame.mixer.music.get_busy():
         pygame.mixer.music.stop()
 
+def print_task(tasks):
+    import sys
+    reload(sys)
+    sys.setdefaultencoding( "utf-8" )
+    print tasks.decode('utf-8')
 
 if __name__ == "__main__":
-    # messages = get_youdao_task()
-    # send_mail(message)
-    # message = 'test'
-    # send_sms(message)
-
     num = 0
     def fun_timer():
         global num
@@ -188,9 +188,10 @@ if __name__ == "__main__":
         print str(num) + ' - Checking youdao translation tasks!'
 
         tasks = get_youdao_task()
-        # tasks = '文档任务: 1, \n快速任务: 0'
+
+        print_task(tasks)
+
         non_zero_number = filter(lambda ch: ch in '123456789', tasks)
-        print tasks
         if non_zero_number:
             if len(non_zero_number) > 1:
                 play_music(True)
