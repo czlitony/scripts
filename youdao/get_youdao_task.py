@@ -87,22 +87,26 @@ def get_youdao_task():
         'Cookie': 'OUTFOX_SEARCH_USER_ID=310822447@113.108.225.251; DICT_LOGIN=8||1532605338270; DICT_FORCE=true; NTES_SESS=CQcM27ByGiblaZ4UR_lWChviPC7bTIf7X7hYgmEK2GSArOhUrIJ5LfIZmEZBCkzhRU.FQxV6Q.Nl8RXx9IBZhanDaBi2X359pZSAla82vI9H.2LiW7_WMzE7lpGzAOlUfSOgB.2Zm7UoezfBZyKrX7o7tMNLW4SqnoRwOKn0PmvORispszmEG2hooGNk278f6BDKWtRMWZ8pf; S_INFO=1532605445|0|3&80##|szhgloria#m15651635739_1#m18625085971; P_INFO=szhgloria@163.com|1532605445|0|dict_hts|00&99|US&1532604628&dict_hts#US&null#10#0#0|&0|dict_hts|szhgloria@163.com; SESSION_FROM_COOKIE=unknown; JSESSIONID=aaaAzIxR2Awro45JBnwtw'
     }
 
-    requests.packages.urllib3.disable_warnings()
-    r = requests.get(url, headers=headers, verify=False)
+    try:
+        requests.packages.urllib3.disable_warnings()
+        r = requests.get(url, headers=headers, verify=False)
 
-    with open('response.html', 'wb') as fd:
-        for chunk in r.iter_content(chunk_size=128):
-            fd.write(chunk)
+        with open('response.html', 'wb') as fd:
+            for chunk in r.iter_content(chunk_size=128):
+                fd.write(chunk)
 
-    text = str()
-    with open('response.html', 'r') as fd:
-        text = fd.read()
+        text = str()
+        with open('response.html', 'r') as fd:
+            text = fd.read()
 
-    par = MyHTMLParser()
-    par.feed(text)
-    # print taskstr
+        par = MyHTMLParser()
+        par.feed(text)
+        # print taskstr
 
-    return taskstr
+        return taskstr
+    except:
+        print "Failed to get youdao tasks! Please check your network."
+        return None
 
 def send_mail(mail_msg):
     # sender = 'czlitony@163.com'
@@ -176,12 +180,21 @@ def print_task(tasks):
     sys.setdefaultencoding( "utf-8" )
     print tasks.decode('utf-8')
 
+def get_task_nums(tasks):
+    # non_zero_number = filter(lambda ch: ch in '123456789', tasks)
+    
+    splited_tasks = tasks.split('\n')
+    fast_task_num = int(splited_tasks[0].split(':')[-1])
+    file_task_num = int(splited_tasks[1].split(':')[-1])
+
+    return [fast_task_num, file_task_num]
+
 if __name__ == "__main__":
     num = 0
     def fun_timer():
         global num
         num += 1
-        if num > 10000:
+        if num > 2880: # 12 hours
             exit()
 
         print '------------------------------------------------------------'
@@ -189,15 +202,17 @@ if __name__ == "__main__":
 
         tasks = get_youdao_task()
 
+        if not tasks:
+            return
+
         print_task(tasks)
 
-        non_zero_number = filter(lambda ch: ch in '123456789', tasks)
-        if non_zero_number:
-            if len(non_zero_number) > 1:
-                play_music(True)
-            else:
-                play_music(False)
-            # send_sms(tasks)
+        task_nums = get_task_nums(tasks)
+
+        if task_nums[1] > 0:
+            play_music(True)
+        elif task_nums[0] > 0:
+            play_music(False)
         else:
             stop_music()
 
@@ -205,5 +220,6 @@ if __name__ == "__main__":
         taskstr = str()
         print ''
 
+    fun_timer()
     t = LoopTimer(15, fun_timer)
     t.start()
