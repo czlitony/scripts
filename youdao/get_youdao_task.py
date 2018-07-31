@@ -2,10 +2,6 @@
 
 import requests
 from HTMLParser import HTMLParser
-import smtplib
-from email.mime.text import MIMEText
-from email.header import Header
-from twilio.rest import Client
 from threading import _Timer
 import pygame
 
@@ -108,64 +104,8 @@ def get_youdao_task():
         print "Failed to get youdao tasks! Please check your network."
         return None
 
-def send_mail(mail_msg):
-    # sender = 'czlitony@163.com'
-    # receivers = ['1271673214@qq.com']
-    # mail_host = 'smtp.163.com'
-    # mail_user = 'czlitony'
-    # mail_pass = 'szhlcz1016'
-
-    sender = '1271673214@qq.com'
-    receivers = ["czlitony@163.com", "393592935@qq.com"]
-    mail_host = 'smtp.qq.com'
-    mail_user = '1271673214'
-    mail_pass = 'avllcfcaihkogjii'
-
-    # message = MIMEText(mail_msg, 'html', 'utf-8')
-    message = MIMEText(mail_msg, 'plain', 'utf-8')
-    message['From'] = sender
-    message['To'] = ";".join(receivers)
-    message['Subject'] = Header('有道翻译来任务了！', 'utf-8')
-
-    try:
-        server = smtplib.SMTP()
-        server.connect(mail_host)
-        server.login(mail_user, mail_pass)
-        server.sendmail(sender, receivers, message.as_string())
-        server.close()
-        print "Send mail successfully"
-    except smtplib.SMTPException as e:
-        print e
-        print "Error: Can't send mail"
-
-
-# 使用Twilio的免费手机号发送短信
-# 你需要在官网上申请一个账号，这里是官网：https://www.twilio.com/
-def send_sms(msg='你好，这是来自自动发送的消息！'):
-    # 从官网获得以下信息
-    account_sid = 'AC02e7184da0252e678a6f4e68b47a6e6f'
-    auth_token = '891894f90e30b33226a100050716650f'
-    twilio_number = '+18142125134'
-    my_number = '+8613262709358'
-
-    account_sid = 'ACb4f3e0045754e807f9188909cb468084'
-    auth_token = 'b583ecdaf05e175f5a48d838a4fa7eeb'
-    twilio_number = '+18704744096'
-    my_number = '+8618625085971'
-
-    client = Client(account_sid, auth_token)
-    try:
-        client.messages.create(to=my_number, from_=twilio_number, body=msg)
-        print('短信已经发送！')
-    except:
-        print('发送失败，请检查你的账号是否有效或网络是否良好！')
-
-
-def play_music(isFileTask):
+def play_music(music):
     pygame.mixer.init()
-    music = "Despacito.mp3"
-    if isFileTask:
-        music = "Sunrise.wav"
     pygame.mixer.music.load(music)
     pygame.mixer.music.play()
 
@@ -182,7 +122,6 @@ def print_task(task_nums):
 
 def get_task_nums(tasks):
     # non_zero_number = filter(lambda ch: ch in '123456789', tasks)
-    
     splited_tasks = tasks.split('\n')
     fast_task_num = int(splited_tasks[0].split(':')[-1])
     file_task_num = int(splited_tasks[1].split(':')[-1])
@@ -199,20 +138,22 @@ if __name__ == "__main__":
 
         print '------------------------------------------------------------'
         print str(num) + ' - Checking youdao translation tasks!'
+        print ''
 
         tasks = get_youdao_task()
 
         if not tasks:
             return
 
-        task_nums = get_task_nums(tasks)
+        # task_nums = get_task_nums(tasks)
+        task_nums = [1,0]
 
         print_task(task_nums)
 
         if task_nums[1] > 0:
-            play_music(True)
+            play_music("Panama.mp3")
         elif task_nums[0] > 0:
-            play_music(False)
+            play_music("Despacito.mp3")
         else:
             stop_music()
 
