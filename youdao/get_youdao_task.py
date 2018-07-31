@@ -178,7 +178,7 @@ def print_task(task_nums):
     if task_nums[1] > 0:
         print 'File File File : ' + str(task_nums[1])
     if task_nums[0] > 0:
-        print 'Fast : ' + str(task_nums[0])
+        print 'Quick : ' + str(task_nums[0])
 
 def get_task_nums(tasks):
     # non_zero_number = filter(lambda ch: ch in '123456789', tasks)
