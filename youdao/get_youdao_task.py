@@ -174,11 +174,11 @@ def stop_music():
     if pygame.mixer.music.get_busy():
         pygame.mixer.music.stop()
 
-def print_task(tasks):
-    import sys
-    reload(sys)
-    sys.setdefaultencoding( "utf-8" )
-    print tasks.decode('utf-8')
+def print_task(task_nums):
+    if task_nums[1] > 0:
+        print 'File File File : ' + str(task_nums[1])
+    if task_nums[0] > 0:
+        print 'Fast : ' + str(task_nums[0])
 
 def get_task_nums(tasks):
     # non_zero_number = filter(lambda ch: ch in '123456789', tasks)
@@ -205,9 +205,9 @@ if __name__ == "__main__":
         if not tasks:
             return
 
-        print_task(tasks)
-
         task_nums = get_task_nums(tasks)
+
+        print_task(task_nums)
 
         if task_nums[1] > 0:
             play_music(True)
