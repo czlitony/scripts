@@ -145,8 +145,7 @@ if __name__ == "__main__":
         if not tasks:
             return
 
-        # task_nums = get_task_nums(tasks)
-        task_nums = [1,0]
+        task_nums = get_task_nums(tasks)
 
         print_task(task_nums)
 
