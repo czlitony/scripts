@@ -107,7 +107,7 @@ def get_youdao_task():
 def play_music(music):
     pygame.mixer.init()
     pygame.mixer.music.load(music)
-    pygame.mixer.music.play()
+    pygame.mixer.music.play(-1)
 
 def stop_music():
     pygame.mixer.init()
@@ -150,9 +150,9 @@ if __name__ == "__main__":
         print_task(task_nums)
 
         if task_nums[1] > 0:
-            play_music("Panama.mp3")
-        elif task_nums[0] > 0:
             play_music("Despacito.mp3")
+        elif task_nums[0] > 0:
+            play_music("Sunrise.wav")
         else:
             stop_music()
 
