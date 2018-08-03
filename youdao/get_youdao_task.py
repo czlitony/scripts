@@ -4,6 +4,7 @@ import requests
 from HTMLParser import HTMLParser
 from threading import _Timer
 import pygame
+import time
 
 class LoopTimer(_Timer):
     """Call a function after a specified number of seconds: 
@@ -79,7 +80,7 @@ def get_youdao_task():
     headers = {
         'Connection': 'Keep-Alive',
         'Accept-Encoding': 'gzip, deflate',
-        # 'Accept-Language': 'zh-Hans-CN,zh-Hans;q=0.8,en-US;q=0.5,en;q=0.3',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; WOW64; Trident/7.0; rv:11.0) like Gecko',
         'Cookie': 'OUTFOX_SEARCH_USER_ID=310822447@113.108.225.251; NTES_SESS=uFtYx58yRLaj9gXVCHaGEoMgrWPQH_90_PF21HdEQc0mpvFRpWZ9_iWVHdVhuKjFqRSaNGgnNS5zxq.GJWhVFTUAThMQ.t9JoR..XUAeAUW5SQ_M8Pb8sjdPzocjmvzRi0v1hSQVHPR3IjihVBEp.P3Pws5_8D0XU3qkvEULyHfvqMrorjHdcQF33c5KQPxinhAE8wqs8Vxoi; S_INFO=1533266440|0|3&80##|szhgloria#m15651635739_1#m18625085971; P_INFO=szhgloria@163.com|1533266440|0|dict_hts|00&99|jis&1533257113&dict_hts#US&null#10#0#0|&0|dict_hts&search&youdaodict_client|szhgloria@163.com; SESSION_FROM_COOKIE=unknown; JSESSIONID=aaaC_aDobhpl2hDNtZ9tw'
     }
 
@@ -94,6 +95,9 @@ def get_youdao_task():
         text = str()
         with open('response.html', 'r') as fd:
             text = fd.read()
+
+        if -1 == text.find('claim-task'):
+            return 'session_expired'
 
         par = MyHTMLParser()
         par.feed(text)
@@ -138,9 +142,19 @@ if __name__ == "__main__":
 
         print '------------------------------------------------------------'
         print str(num) + ' - Checking youdao translation tasks!'
-        print ''
+
+        start_time = time.time()
 
         tasks = get_youdao_task()
+
+        end_time = time.time()
+        print "Time: " + str(end_time - start_time) + " seconds"
+
+        print ''
+
+        if 'session_expired' == tasks:
+            print "session expired !!!"
+            exit()
 
         if not tasks:
             return
