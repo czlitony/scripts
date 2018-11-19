@@ -3,7 +3,7 @@ import os
 import ftplib
 from ftplib import FTP
 
-local_installer_path = os.path.expanduser("~") + "\\Desktop\\VxmeInstallers1\\"
+local_installer_path = os.path.expanduser("~") + "\\Desktop\\VxmeInstallers\\"
 ftp_installer_path = '/FTPServer/users/chengzhl/VxmeInstallers'
 
 FTP_SERVER = 'cmbu-ftp.cisco.com'
