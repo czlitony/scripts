@@ -25,7 +25,19 @@ if __name__ == '__main__':
         print("You need to run this script like this:\n   python run_test_repeatedly.py \"TestProgramName --gtest-filter=*\"")
     else:
         program = sys.argv[1]
-        for index in range(1, 10000):
+        success_cnt = 0
+        failure_cnt = 0
+        total_time_cost = 0
+        for index in range(1, 1 + 100):
             print('Running ' + program + ': ' + str(index))
-            if not run_test(sys.argv[1]):
-                break
+            start_time = time.time()
+            succeeded = run_test(sys.argv[1])
+            end_time = time.time()
+            time_cost = end_time - start_time
+            print('succeeded: ' + str(succeeded) + ', time cost: ' + str(time_cost))
+            if succeeded:
+                success_cnt += 1
+                total_time_cost += time_cost
+            else:
+                failure_cnt += 1
+        print('success_cnt: ' + str(success_cnt) + ', total time cost: ' + str(total_time_cost) + ', failure_cnt: ' + str(failure_cnt))
