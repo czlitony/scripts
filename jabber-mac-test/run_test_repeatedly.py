@@ -32,7 +32,8 @@ if __name__ == '__main__':
         failure_cnt = 0
         total_time_cost = 0
         for index in range(1, 1 + 100):
-            print('Running ' + program + ': ' + str(index))
+            print('Index: ' + str(index))
+            print('Command: ' + program)
             succeeded, time_cost = run_test(sys.argv[1])
             print('Succeeded: ' + str(succeeded))
             print('Total failure count: ' + str(failure_cnt))
