@@ -35,6 +35,7 @@ if __name__ == '__main__':
             print('Running ' + program + ': ' + str(index))
             succeeded, time_cost = run_test(sys.argv[1])
             print('Succeeded: ' + str(succeeded))
+            print('Total failure count: ' + str(failure_cnt))
             print('')
             if succeeded:
                 success_cnt += 1
