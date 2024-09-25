@@ -11,7 +11,7 @@ def run_test(program):
     """do test"""
     start_time = time.time()
 
-    command = program + " > repeat_test.log 2>&1"
+    command = program + " >> repeat_test.log 2>&1"
 
     sp = subprocess.Popen(command, shell=True)
     sp.communicate()
