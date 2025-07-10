@@ -3,6 +3,8 @@ import os
 import ftplib
 from ftplib import FTP
 
+# test comment
+
 local_installer_path = os.path.expanduser("~") + "\\Desktop\\VxmeInstallers\\"
 ftp_installer_path = '/FTPServer/users/chengzhl/VxmeInstallers'
 
