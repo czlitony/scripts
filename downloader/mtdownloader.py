@@ -91,6 +91,13 @@ from dataclasses import dataclass
 from requests.auth import AuthBase, HTTPBasicAuth
 import urllib3
 
+# Disable output buffering for proper progress bar display on Linux/Unix
+if hasattr(sys.stdout, 'reconfigure'):
+    try:
+        sys.stdout.reconfigure(line_buffering=False)
+    except:
+        pass
+
 # Enable ANSI escape sequences on Windows
 if sys.platform == 'win32':
     try:
@@ -188,6 +195,8 @@ class ProgressDisplay:
         self.enable_console = enable_console
         self.callback = callback
         self._last_percentage = -1
+        # Check if stdout is a real terminal (not piped or redirected)
+        self._is_tty = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
 
     def update(self, progress: DownloadProgress):
         if self.callback:
@@ -202,33 +211,52 @@ class ProgressDisplay:
             self._last_percentage = progress.percentage
 
     def _display_progress(self, progress: DownloadProgress):
-        bar_length = 50
+        # Get terminal width, default to 80 if unable to detect
+        try:
+            import shutil
+            term_width = shutil.get_terminal_size().columns
+        except:
+            term_width = 80
+        
+        # Calculate bar length based on terminal width (leave room for other text)
+        # Format: [====] 99.9% (999.9/999.9 MB) 99.9 MB/s
+        # Approx 45 chars for the stats part
+        bar_length = min(30, max(10, term_width - 50))
+        
         filled = int(bar_length * progress.percentage / 100)
-        bar = "█" * filled + "-" * (bar_length - filled)
+        bar = "=" * filled + "-" * (bar_length - filled)
         speed_mb = progress.speed_bps / (1024 * 1024)
         
-        message = (
-            f"Progress: |{bar}| {progress.percentage:.1f}% "
-            f"({progress.downloaded_mb:.1f}/{progress.total_mb:.1f} MB) @ {speed_mb:.1f} MB/s"
+        message = "[%s] %.1f%% (%.1f/%.1f MB) %.1f MB/s" % (
+            bar, progress.percentage, progress.downloaded_mb, progress.total_mb, speed_mb
         )
-        sys.stdout.write(f"\r{message}\033[K")
-        sys.stdout.flush()
-
+        
+        # Truncate message if still too long
+        if len(message) >= term_width:
+            message = message[:term_width - 1]
+        
+        if self._is_tty:
+            # Real terminal: overwrite the line
+            print("\r" + message, end="", flush=True)
+        else:
+            # Not a terminal: print each update on new line (every 10%)
+            if int(progress.percentage) % 10 == 0 and int(self._last_percentage) % 10 != 0:
+                print(message, flush=True)
     def finish(self, progress: DownloadProgress, success: bool = True):
         if self.enable_console:
-            bar_length = 50
+            bar_length = 40
             if success:
-                bar = "█" * bar_length
-                message = f"Progress: |{bar}| 100.0% ({progress.total_mb:.1f}/{progress.total_mb:.1f} MB)"
+                bar = "=" * bar_length
+                message = "[%s] 100.0%% (%.1f/%.1f MB) - Done" % (
+                    bar, progress.total_mb, progress.total_mb
+                )
             else:
                 filled = int(bar_length * progress.percentage / 100)
-                bar = "█" * filled + "-" * (bar_length - filled)
-                message = (
-                    f"Progress: |{bar}| {progress.percentage:.1f}% "
-                    f"({progress.downloaded_mb:.1f}/{progress.total_mb:.1f} MB) - INTERRUPTED"
+                bar = "=" * filled + "-" * (bar_length - filled)
+                message = "[%s] %.1f%% (%.1f/%.1f MB) - INTERRUPTED" % (
+                    bar, progress.percentage, progress.downloaded_mb, progress.total_mb
                 )
-            sys.stdout.write(f"\r{message}\033[K\n")
-            sys.stdout.flush()
+            print("\r" + message + "          ", flush=True)
 
         if self.callback:
             try:
@@ -676,6 +704,9 @@ class Downloader:
     def _log(self, message: str) -> None:
         """Log message if verbose mode is enabled."""
         if self.verbose:
+            # Clear current line before printing to avoid interfering with progress bar
+            sys.stdout.write('\r' + ' ' * 80 + '\r')
+            sys.stdout.flush()
             print(message)
 
 
